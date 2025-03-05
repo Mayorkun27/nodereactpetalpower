@@ -1,6 +1,6 @@
 import express from "express";
-import { validationResult } from "express-validator";
-import { uploadProduct, getAllProducts } from "../controllers/productController.js";
+import { param } from "express-validator";
+import { uploadProduct, getAllProducts, getAProductDetails, deleteAProduct } from "../controllers/productController.js";
 
 import handleUpload from "../middleware/uploadMiddleware.js";
 
@@ -21,6 +21,23 @@ router.post(
     handleUpload.single("image"),
     uploadProduct
 );
+
+router.get(
+    "/:id", 
+    [
+        param("id").notEmpty().withMessage("Product Id is required"),
+    ],
+    getAProductDetails
+);
+
+router.delete(
+    "/deleteproduct/:id", 
+    [
+        param("id").notEmpty().withMessage("Product Id is required"),
+    ],
+    deleteAProduct
+);
+
 
 router.get("/allproducts", getAllProducts);
 

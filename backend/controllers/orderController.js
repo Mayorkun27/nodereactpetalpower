@@ -108,12 +108,47 @@ export const checkOutOrder = async (req, res) => {
         });
 
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ 
+            error: error.message 
+        });
     }
 };
 
 export const completeOrder = async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+    try {
+        const orderId = req.params.id;
     
+        const findOrderInDb = await orderSchema.findOne({ orderId: orderId });
+        if (!findOrderInDb) {
+            return res.status(400).json({
+                success: false,
+                message: `Order with ID ${orderId} not found`
+            });
+        }
+
+        // ✅ Update product stock in DB
+        const findAndUpdateOrderStatus = await orderSchema.findOneAndUpdate(
+            { orderId: orderId },
+            { orderStatus: "completed" },
+            { new: true }
+        );
+
+        res.status(200).json({ 
+            success: true, 
+            message: `Order with ID ${orderId} has been completed`,
+            order: findAndUpdateOrderStatus
+        });
+
+    } catch (error) {
+        res.status(500).json({ 
+            success: false, 
+            error: error.message,
+        });
+    }
 }
 
 export const getallOrders = async (req, res) => {
@@ -128,5 +163,35 @@ export const getallOrders = async (req, res) => {
         res.status(500).json({
             error: error.message,
         })
+    }
+}
+
+export const getAUserOrder = async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+    try {
+        const userId = req.params.id;
+    
+        const findMyOrderInDB = await orderSchema.find({ clientId: userId });
+        if (!findMyOrderInDB) {
+            return res.status(400).json({
+                success: false,
+                message: `No Order found for user with ID ${userId} not found`
+            });
+        }
+
+        res.status(200).json({ 
+            success: true, 
+            message: `Fetched all Order for user with ID of ${userId}`,
+            order: findMyOrderInDB
+        });
+
+    } catch (error) {
+        res.status(500).json({ 
+            success: false, 
+            error: error.message,
+        });
     }
 }
