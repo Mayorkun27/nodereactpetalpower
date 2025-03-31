@@ -12,7 +12,7 @@ export const registerUser = async (req, res) => {
     }
     try {
         const { fName, lName, email, phoneNumber, address, password, subscribe, role } = req.body;
-
+        
         // Find existing email
         const findEmailInDb = await userSchema.findOne({ email });
         if (findEmailInDb) {
@@ -20,6 +20,18 @@ export const registerUser = async (req, res) => {
                 message: "Email already in use"
             })
         };
+
+        // convert to null if the number is empty
+        const formattedPhoneNumber = phoneNumber.trim() === "" ? null : phoneNumber;
+        // If phone number is provided then check if it already exists
+        if (formattedPhoneNumber) {
+            const findPhoneInDb = await userSchema.findOne({ phoneNumber: formattedPhoneNumber });
+            if (findPhoneInDb) {
+                return res.status(400).json({ 
+                    message: "Phone number already in use" 
+                });
+            }
+        }
 
         // Hash Password
         const hashedPassword = await hashPassword(password)
@@ -29,9 +41,9 @@ export const registerUser = async (req, res) => {
             fName, 
             lName, 
             email, 
-            phoneNumber, 
+            phoneNumber: formattedPhoneNumber, // ✅ Now manually validated
             address, 
-            password : hashedPassword, 
+            password: hashedPassword, 
             subscribe, 
             role
         });
@@ -42,7 +54,7 @@ export const registerUser = async (req, res) => {
         });
     } catch (error) {
         res.status(500).json({
-            error: error.message,
+            error: error,
         })
     }
 }
@@ -100,11 +112,24 @@ export const loginUser = async (req, res) => {
 
 export const getallUsers = async (req, res) => {
     try {
-        const allUsers = await userSchema.find();
-        console.log(allUsers)
-        res.status(201).json({
+        const allUsers = await userSchema.find().select("-password");
+        res.status(200).json({
             message: "Users fetched successfully",
             data: allUsers,
+        })
+    } catch (error) {
+        res.status(500).json({
+            error: error.message,
+        })
+    }
+}
+
+export const getSubscribedUsers = async (req, res) => {
+    try {
+        const subdUsers = await userSchema.find({ subscribe: true });
+        res.status(200).json({
+            message: "Subscribed users fetched successfully",
+            data: subdUsers,
         })
     } catch (error) {
         res.status(500).json({

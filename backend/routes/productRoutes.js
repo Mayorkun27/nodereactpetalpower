@@ -1,7 +1,6 @@
 import express from "express";
 import { param } from "express-validator";
 import { uploadProduct, getAllProducts, getAProductDetails, deleteAProduct } from "../controllers/productController.js";
-
 import handleUpload from "../middleware/uploadMiddleware.js";
 
 const router = express.Router();
@@ -23,7 +22,7 @@ router.post(
 );
 
 router.get(
-    "/:id", 
+    "/productinfo/:id", 
     [
         param("id").notEmpty().withMessage("Product Id is required"),
     ],

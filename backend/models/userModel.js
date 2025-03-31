@@ -18,7 +18,7 @@ const userSchema = new mongoose.Schema({
     },
     phoneNumber: {
         type: String,
-        unique: true
+        sparse: true // ✅ Allows multiple null values without uniqueness constraint
     },
     address: {
         type: String,

@@ -10,20 +10,20 @@ export const checkOutOrder = async (req, res) => {
     }
 
     try {
-        const { clientId, cart } = req.body;
+        const { cart } = req.body;
 
-        // ✅ Check if the client exists in the database
-        const client = await userSchema.findById(clientId);
-        if (!client) {
-            return res.status(400).json({ message: "Client not found" });
-        }
+        // // ✅ Check if the client exists in the database
+        // const client = await userSchema.findById(clientId);
+        // if (!client) {
+        //     return res.status(400).json({ message: "Client not found" });
+        // }
 
-        // ✅ Check if clientTel and clientAddress are missing
-        if (!client.phoneNumber || !client.address) {
-            return res.status(400).json({
-                message: "Please update your phone number and address before placing an order."
-            });
-        }
+        // // ✅ Check if clientTel and clientAddress are missing
+        // if (!client.phoneNumber || !client.address) {
+        //     return res.status(400).json({
+        //         message: "Please update your phone number and address before placing an order."
+        //     });
+        // }
 
         const generateOrderId = async () => {
             const year = new Date().getFullYear();
@@ -34,7 +34,7 @@ export const checkOutOrder = async (req, res) => {
         const generatedOrderId = await generateOrderId();
 
         let totalCost = 0;
-        let defaultOrderStatus = "pending";
+        let defaultOrderStatus = "queued";
 
         for (const cartItem of cart) {
 
@@ -77,11 +77,16 @@ export const checkOutOrder = async (req, res) => {
             // ✅ Save order
             const newOrder = new orderSchema({
                 orderId: generatedOrderId,
-                clientId: client._id,
-                clientName: `${client.fName} ${client.lName}`,
-                clientEmail: client.email,
-                clientTel: client.phoneNumber,
-                clientAddress: client.address,
+                // clientId: client._id,
+                // clientName: `${client.fName} ${client.lName}`,
+                // clientEmail: client.email,
+                // clientTel: client.phoneNumber,
+                // clientAddress: client.address,
+                clientId: "",
+                clientName: "",
+                clientEmail: "",
+                clientTel: "",
+                clientAddress: "",
                 prodId: productId,
                 prodName: findProductInDb.name,
                 prodDesc: findProductInDb.description,
@@ -99,12 +104,12 @@ export const checkOutOrder = async (req, res) => {
             message: "Checkout successful",
             orderId: generatedOrderId,
             totalCost: totalCost,
-            "deliveryDetails" : {
-                "clientId" : client._id,
-                "clientName" : `${client.fName} ${client.lName}`,
-                "clientTel" : client.phoneNumber,
-                "clientAddress" : client.address
-            }
+            // "deliveryDetails" : {
+            //     "clientId" : client._id,
+            //     "clientName" : `${client.fName} ${client.lName}`,
+            //     "clientTel" : client.phoneNumber,
+            //     "clientAddress" : client.address
+            // }
         });
 
     } catch (error) {
@@ -113,6 +118,61 @@ export const checkOutOrder = async (req, res) => {
         });
     }
 };
+
+export const checkOutOrderClient = async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+    
+    try {
+        const { clientId, orderId } = req.body;
+
+        // ✅ Check if the client exists in the database
+        const client = await userSchema.findById(clientId);
+        if (!client) {
+            return res.status(400).json({ message: "Client not found" });
+        }
+
+        // ✅ Check if clientTel and clientAddress are missing
+        if (!client.phoneNumber || !client.address) {
+            return res.status(400).json({
+                message: "Please update your phone number and address before placing an order."
+            });
+        }
+
+        await orderSchema.findOneAndUpdate(
+            { orderId: orderId },
+            { clientId: client.clientId },
+            // { clientName: `${client.fName} ${client.lName}` },
+            // { clientEmail: client.email },
+            // { clientTel: client.phoneNumber },
+            // { clientAddress: client.address },
+            // { orderStatus: "pending" },
+            { new: true}
+        )
+
+        res.status(200).json({
+            message: "Checkout successful",
+            // orderInfo: findAndUpdateOrderWithUserInformations,
+            "deliveryDetails" : {
+                "clientId" : client._id,
+                "clientName" : `${client.fName} ${client.lName}`,
+                "clientTel" : client.phoneNumber,
+                "clientAddress" : client.address
+            }
+        });
+
+        // if (findAndUpdateOrderWithUserInformations) {
+        //     // ✅ Send final response after all fields are updated
+        // }
+
+    } catch (error) {
+        res.status(500).json({ 
+            error: error.message 
+        });
+    }
+}
 
 export const completeOrder = async (req, res) => {
     const errors = validationResult(req);
@@ -154,7 +214,6 @@ export const completeOrder = async (req, res) => {
 export const getallOrders = async (req, res) => {
     try {
         const allOrders = await orderSchema.find();
-        console.log(allOrders)
         res.status(200).json({
             message: "Orders fetched successfully",
             data: allOrders,

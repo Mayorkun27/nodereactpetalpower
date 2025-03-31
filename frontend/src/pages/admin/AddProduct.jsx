@@ -3,6 +3,7 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
 import { v4 as uuidv4 } from "uuid";
+import toast from "react-hot-toast";
 
 
 const Addproduct = () => {
@@ -24,10 +25,10 @@ const Addproduct = () => {
       quantity: Yup.number().required("Quantity is required!"),
       image: Yup.mixed().required("Image is required!"),
     }),
-    onSubmit: async (values, { setSubmitting, resetForm }) => {
-      const productId = uuidv4(); // Generate a unique ID here
+    onSubmit: async (values, { setSubmitting }) => {
+      // const productId = uuidv4(); // Generate a unique ID here
       const formData = new FormData();
-      formData.append("id", productId);
+      // formData.append("id", productId);
       formData.append("category", values.category);
       formData.append("name", values.name);
       formData.append("description", values.description);
@@ -41,15 +42,23 @@ const Addproduct = () => {
       }
       
       try {
-        const response = await axios.post("http://localhost/PhP_Journey/PetalPower/upload.php", formData, {
+        const response = await axios.post("http://localhost:5000/api/v1/product/uploadproduct", formData, {
            headers: { "Content-Type": "multipart/form-data" } 
         });
         console.log("Response:", response.data);
-        resetForm(); // Reset the form after successful submission
+        if (response.status == 201) {
+          toast.success(response.data.message)
+          console.log(response.data.message)
+        } else {
+          toast.error(response.data.message)
+        }
       } catch (error) {
+        toast.error(error.message);
         console.error("Error uploading product:", error);
       } finally {
-        setSubmitting(false);
+        setTimeout(() => {
+          setSubmitting(false);
+        }, 3000);
       }
     },
     
@@ -63,11 +72,11 @@ const Addproduct = () => {
 
   return (
     <div className="flex justify-center items-center min-h-max py-5">
-      <div className="bg-white rounded-md p-8 shadow-md w-full max-w-2xl">
+      <div className="bg-white rounded-md p-8 shadow-md w-full max-w-2xl mt-5">
         <h2 className="text-2xl font-bold mb-6">Upload New Product</h2>
         <form onSubmit={formik.handleSubmit} className="flex flex-wrap justify-between">
 
-          <div className="w-[48%] my-3">
+          <div className="md:w-[48%] w-full my-3">
             <label className="block text-sm font-medium mb-2">Category</label>
             <select
               name="category"
@@ -84,7 +93,7 @@ const Addproduct = () => {
             )}
           </div>
 
-          <div className="w-[48%] my-3">
+          <div className="md:w-[48%] w-full my-3">
             <label className="block text-sm font-medium mb-2">Name</label>
             <input
               type="text"
@@ -99,7 +108,7 @@ const Addproduct = () => {
             )}
           </div>
 
-          <div className="w-[48%] my-3">
+          <div className="md:w-[48%] w-full my-3">
             <label className="block text-sm font-medium mb-2">Quantity</label>
             <input
               type="number"
@@ -114,7 +123,7 @@ const Addproduct = () => {
             )}
           </div>
 
-          <div className="w-[48%] my-3">
+          <div className="md:w-[48%] w-full my-3">
             <label className="block text-sm font-medium mb-2">Price ($)</label>
             <input
               type="number"
@@ -137,7 +146,8 @@ const Addproduct = () => {
               name="description"
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
-              className="border p-2 resize-none w-full focus:ring-0 bg-pryClr focus:border-black h-20"
+              rows={4}
+              className="border p-2 resize-none w-full focus:ring-0 bg-pryClr focus:border-black"
               placeholder="Product description"
             ></textarea>
             {formik.touched.description && formik.errors.description && (
@@ -162,7 +172,7 @@ const Addproduct = () => {
 
           <button
             type="submit"
-            className="w-1/2 mx-auto bg-green-600 rounded-md mt-10 text-white p-2 font-medium hover:bg-blue-600 transition"
+            className="w-1/2 mx-auto bg-compClr rounded-md mt-10 text-white p-2 font-medium transition"
           >
             {formik.isSubmitting ? "Uploading..." : "Upload Product"}
           </button>

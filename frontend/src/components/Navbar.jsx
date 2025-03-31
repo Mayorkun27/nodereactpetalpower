@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import img3 from "../assets/images/img3.jpeg"
 import { FaBarsStaggered, FaX } from "react-icons/fa6";
 import { IoBagHandleOutline } from "react-icons/io5";
@@ -6,25 +6,58 @@ import LinkTags from "./Links";
 import ButtonTwo from "./Button/Buttontwo";
 import { useCart } from "../hooks/CartContext";
 import CardFive from "./card/Cardfive";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useUser, useUserUpdate } from "../hooks/UserContext";
+import toast from "react-hot-toast";
 
 const Navbar = () => {
 
-    const navigate = useNavigate();
+    const searchParams = new URLSearchParams(useLocation().search);
+    const isAuthenticated = searchParams.get("authenticated") === "true";
+    localStorage.setItem("isAuth", JSON.stringify(isAuthenticated));
 
+    
     const [openCart, setOpenCart] = useState(false)
     const [openNav, setOpenNav] = useState(false)
     const {cartProducts, incrementQuantity, decrementQuantity} = useCart();
-    const [userDetails, setUserDetails] = useState({})
-    const [isLoggedIn, setIsLoggedIn] = useState(true)
+    const [isLoggedIn, setIsLoggedIn] = useState(false)
+    const [totalPrice, setTotalPrice] = useState(0)
+    
+    const sessionData = useUser();
+    const setSessionData = useUserUpdate(); // ✅ Get update function
+    useEffect(() => {
+        const checkIfAuthenticated = JSON.parse(localStorage.getItem("isAuth"));
+        console.log("checkIfAuthenticated", checkIfAuthenticated);
+        console.log(sessionData);
+        setIsLoggedIn(checkIfAuthenticated && sessionData ? true : false);
+    }, [sessionData]);    
 
-    console.log(cartProducts)
-    const handleOpenCart = () => {
-        setOpenCart(true)
-        if (openNav == true) {
-            setOpenNav(false)
+    // ✅ Remove "?authenticated=true" from URL
+    const navigate = useNavigate();
+    useEffect(() => {
+        if (isAuthenticated) {
+            navigate(window.location.pathname, { replace: true }); // ✅ Removes query params
         }
-    }
+    }, [isAuthenticated]);
+
+    useEffect(() => {
+        let total = 0;
+        cartProducts.map(({price}) => {
+            total += Number(price)
+            setTotalPrice(total)
+        })
+    }, [cartProducts])
+
+    const handleLogOut = () => {
+        localStorage.removeItem("user");
+        localStorage.removeItem("isAuth");
+        setSessionData(null); // ✅ Reset session data
+        window.location.reload();
+    };
+
+    const handleCheckout = () => {
+        toast.error("You need to be logged in to initiate a checkout")
+    };
 
     const cardBg = {
         background : `${`linear-gradient(135deg, #074626d1, #0a0a0ae0), url(${img3})`}`,
@@ -55,7 +88,7 @@ const Navbar = () => {
                         {
                             isLoggedIn ? (
                                 <details className="border rounded-full bg-transparent w-[300px] text-center py-5 cursor-pointer hover:scale text-pryClr shadow-xl shadow-secClr px-4 list-none relative">
-                                    <summary className="list-none font-semibold capitalize">{"user" || userDetails.fName}</summary>
+                                    <summary className="list-none font-semibold capitalize">{sessionData.fName}</summary>
                                     <ul className="absolute top-24 left-1/2 -translate-x-1/2 right-0 w-[300px] border-2 z-[100] shadow-xl shadow-secClr bg-pryClr text-secClr rounded-xl flex flex-col gap-2 whitespace-nowrap text-xl">
                                         <LinkTags href={"/myorders"} title={"Active Orders"} />
                                         <LinkTags href={"/shop/checkout"} title={"Checkout"} />
@@ -73,8 +106,9 @@ const Navbar = () => {
 
             {/* Navbar */}
             <nav className="px-5 py-2 backdrop-blur-sm border border-tetClr text-tetClr rounded-full flex justify-between items-center">
-                <i className="md:hidden block" onClick={() => setOpenCart(true)}>
+                <i className="md:hidden block relative cursor-pointer" onClick={() => setOpenCart(true)}>
                     <IoBagHandleOutline className="size-7" />
+                    <span className="w-5 h-5 bg-pryClr text-secClr absolute -top-2 -right-2 border-2 border-compClr text-xs font-bold rounded-full flex justify-center items-center">{cartProducts.length}</span>
                 </i>
                 <div className="flex gap-5">
                     <h3 className="text-3xl logo relative p-2">
@@ -89,14 +123,15 @@ const Navbar = () => {
                 </div>
                 <div>
                     <ul className="md:flex hidden items-center justify-between gap-3 relative">
-                        <li onClick={() => setOpenCart(true)}>
+                        <li className="relative cursor-pointer" onClick={() => setOpenCart(true)}>
                             <IoBagHandleOutline className="size-5" />
+                            <span className="w-5 h-5 bg-pryClr text-secClr absolute -top-2 -right-2 border-2 border-compClr text-xs font-bold rounded-full flex justify-center items-center">{cartProducts.length}</span>
                         </li>
                         <LinkTags href={"/contact"} title={"Contact"} optStyle={"nav-link border border-pryClr"} />
                         {
                             isLoggedIn ? (
                                 <details className="border rounded-full bg-pryClr cursor-pointer hover:scale text-secClr shadow-xl shadow-secClr px-4 py-2 list-none">
-                                    <summary className="list-none font-semibold capitalize">{"user" || userDetails.fName}</summary>
+                                    <summary className="list-none font-semibold capitalize">{sessionData.fName}</summary>
                                     <ul className="absolute top-14 right-0 w-max border z-[100] bg-pryClr shadow-xl shadow-secClr rounded-lg flex flex-col whitespace-nowrap">
                                         <LinkTags href={"/myorders"} title={"Active Orders"} optStyle={"border-b border-secClr"} />
                                         <LinkTags href={"/shop/checkout"} title={"Checkout"} optStyle={"border border-pryClr"} />
@@ -124,15 +159,15 @@ const Navbar = () => {
                 <div className="overflow-y-scroll text-pryClr h-full filter-bar cart-bar pe-2 space-y-5">
                     {
                         cartProducts.length > 0 ? (
-                            cartProducts.map(({id, image, name, price, quantity}, index) => (
+                            cartProducts.map(({prodId, image, name, price, quantity}, index) => (
                                 <CardFive
                                     key={index}
-                                    image={image}
+                                    image={`http://localhost:5000${image}`}
                                     name={name}
                                     price={price}
                                     quantity={quantity}  
-                                    action1={() => incrementQuantity(id)}
-                                    action2={() => decrementQuantity(id)}  
+                                    action1={() => incrementQuantity(prodId)}
+                                    action2={() => decrementQuantity(prodId)}  
                                 />
                             ))
                         ) : (
@@ -140,18 +175,35 @@ const Navbar = () => {
                         )
                     }
                 </div>
-                <div className="flex w-full md:gap-10 gap-2 mt-auto">
-                    <ButtonTwo title={"Close Cart"} optStyle={"w-full border-2 border-compClr text-secClr"} action={() => setOpenCart(false)} />
-                    <Link 
-                        to={"/shop/checkout"} 
-                        className={`w-full ${cartProducts.length <= 0 ? "pointer-events-none opacity-20" : null}`} 
-                        children={
+                <div className="flex flex-col gap-3 mt-auto">
+                    <div className="flex justify-between">
+                        <span>Total Price:</span>
+                        <span className="font-bold text-right">${totalPrice.toFixed(2)}</span>
+                    </div>
+                    <div className="flex w-full md:gap-10 gap-2">
+                        <ButtonTwo title={"Close Cart"} optStyle={"w-full border-2 border-compClr text-secClr"} action={() => setOpenCart(false)} />
+                        {
+                            isLoggedIn 
+                            ? 
+                            <Link 
+                                to={"/shop/checkout"} 
+                                className={`w-full ${cartProducts.length <= 0 ? "pointer-events-none opacity-20" : null}`} 
+                                children={
+                                    <ButtonTwo 
+                                        title={"Finish Purchase"} 
+                                        optStyle={"whitespace-nowrap py-3 bg-compClr text-tetClr font-semibold"} 
+                                    />
+                                } 
+                            />
+                            : 
                             <ButtonTwo 
                                 title={"Finish Purchase"} 
                                 optStyle={"whitespace-nowrap py-3 bg-compClr text-tetClr font-semibold"} 
+                                action={() => handleCheckout()}
                             />
-                        } 
-                    />
+                        }
+                        
+                    </div>
                 </div>
             </div>
         </>

@@ -1,4 +1,5 @@
 import { createContext, useState, useContext, useEffect } from "react";
+import toast from "react-hot-toast";
 
 const CartContext = createContext();
 
@@ -15,14 +16,15 @@ export const CartProvider = ({ children }) => {
   localStorage.setItem("Products List", JSON.stringify([...cartProducts]));
 
   const addToCart = (product) => {
+    toast.success(`${product.name} added to cart`)
 
-    // Check if product exists in the ls
+    // Check if product exists in the localstorage
     const cart = JSON.parse(localStorage.getItem("cartProducts")) || [];
-    const existingProduct = cart.find(item => item.id === product.id);
+    const existingProduct = cart.find(item => item.prodId === product.prodId);
 
     // If product exists in the ls, then update quantity...
     if (existingProduct) {
-        incrementQuantity(product.id);
+        incrementQuantity(product.prodId);
     } else {
       // ...else create a new entry
       const newProduct = {
@@ -38,10 +40,10 @@ export const CartProvider = ({ children }) => {
 
 
   // Increment products
-  const incrementQuantity = (id) => {
+  const incrementQuantity = (prodId) => {
     const cart = JSON.parse(localStorage.getItem("cartProducts")) || [];
     const updatedCart = cart.map(product => {
-        if (product.id === id) {
+        if (product.prodId === prodId) {
             const updatedQuantity = product.quantity + 1;
             return {
                 ...product,
@@ -56,10 +58,10 @@ export const CartProvider = ({ children }) => {
   };
 
   // Decrement products
-  const decrementQuantity = (id) => {
+  const decrementQuantity = (prodId) => {
       const cart = JSON.parse(localStorage.getItem("cartProducts")) || [];
       const updatedCart = cart.map(product => {
-          if (product.id === id && product.quantity > 0) {
+          if (product.prodId === prodId && product.quantity > 0) {
               const updatedQuantity = product.quantity - 1;
               return {
                   ...product,

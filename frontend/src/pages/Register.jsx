@@ -22,48 +22,51 @@ const Register = () => {
 
     const formik = useFormik({
         initialValues : {
-            fName: "",
-            lName: "",
-            email: "",
-            phoneNumber: "",
-            address: "",
-            password: "",
-            confPassword: "",
+            fName: '',
+            lName: '',
+            email: '',
+            phoneNumber: '',
+            address: '',
+            password: '',
+            confPassword: '',
             subscribe: false,
         },
         validationSchema: Yup.object().shape({
             fName: Yup.string().required("First name is required"),
             lName: Yup.string().required("Last name is required"),
             email: Yup.string().email().required("Email is required"),
+            phoneNumber: Yup.string().optional().min(11, "Incomplete Phone Number"),
+            address: Yup.string().optional(),
             password: Yup.string().required("Password is required").min(8, "Password must be at least 8 characters"),
             confPassword: Yup.string()
                 .oneOf([Yup.ref('password'), null], "Passwords must match")
                 .required("Please rewrite the password"),
             }),
+            subscribe: Yup.boolean(false).optional(),
         onSubmit : async ( values, { setSubmitting, resetForm } ) => {
             console.log(values);
             setSubmitting(true)
             try {
-                const response = await axios.post("http://localhost:5000/api/v1/user/register", values, {
+                const response = await axios.post(`http://localhost:5000/api/v1/user/register`, values, {
                     withCredentials: true,
                     headers: {
                         "Content-Type": "application/json",
                     },
                 })
                 console.log(response);
-                if (response.data.status === 200) {
+                if (response.status === 201) {
                     toast.success(response.data.message)
                     toast.success("Redirecting to login...")
                     setTimeout(() => {
                         navigate("/login");
                     }, 3000)
                 } else {
-                    console.error("Error", response.data.message);
-                    toast.error(response.data.message)
+                    console.error("Error", response.data.response);
+                    toast.error(response.data.response.data.message)
                 }
             } catch (error) {
                 console.error("Error:", error);
-                toast.error(error.message)
+                toast.error(error.response.data.message)
             } finally {
                 setTimeout(() => {
                     setSubmitting(false);
@@ -247,7 +250,7 @@ const Register = () => {
                         <hr className='border w-full mt-1 border-secClr/30 rounded-full '/>
                     </div>
                     <NavLink to={"/login"} className={"text-center block"}>
-                    Already a customer? Login Here.
+                        Already a customer? <span className="underline">Login Here.</span>
                     </NavLink>
                 </div>
             </div>

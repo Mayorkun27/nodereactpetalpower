@@ -1,5 +1,5 @@
 import express from "express";
-import { checkOutOrder, completeOrder, getallOrders, getAUserOrder } from "../controllers/orderController.js";
+import { checkOutOrder, checkOutOrderClient, completeOrder, getallOrders, getAUserOrder } from "../controllers/orderController.js";
 import { body, param } from "express-validator";
 
 const router = express.Router();
@@ -7,9 +7,18 @@ const router = express.Router();
 router.post(
     "/checkoutorder",
     [
-        body("clientId").notEmpty().withMessage("Client Id is required"),
+        body("cart").notEmpty().withMessage("Cart Id is required"),
     ],
     checkOutOrder
+);
+
+router.post(
+    "/checkoutorderclient",
+    [
+        body("clientId").notEmpty().withMessage("Client Id is required"),
+        body("orderId").notEmpty().withMessage("Order Id is required"),
+    ],
+    checkOutOrderClient
 );
 
 router.post(

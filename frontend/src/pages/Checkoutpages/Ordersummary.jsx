@@ -1,11 +1,12 @@
 import React from 'react';
 
 const Ordersummary = ({ cartProducts, orderInfo }) => {
+    console.log(orderInfo)
 
     const summation = 
         cartProducts
             .reduce((sum, cartProducts) => 
-                sum + Number(cartProducts.price), 0)
+                sum + Number(cartProducts.price), 0).toFixed(2)
 
   return (
 
@@ -34,7 +35,7 @@ const Ordersummary = ({ cartProducts, orderInfo }) => {
                     <tbody>
                         {
                             cartProducts.map((cartProduct) => (
-                                <tr key={cartProduct.id}>
+                                <tr key={cartProduct.prodId}>
                                     <td>{cartProduct.name}</td>
                                     <td>{cartProduct.basePrice}</td>
                                     <td>{cartProduct.quantity}</td>
@@ -55,11 +56,11 @@ const Ordersummary = ({ cartProducts, orderInfo }) => {
        <div className="border border-secClr/40 py-3 px-5 rounded-md">
             <p className='text-start font-bold text-xl mb-5'>Shipping Details</p>
             <ul className='my-3 space-y-1'>
-                <li>{orderInfo}</li>
-                <li>Adeleke Oluwamayokun</li>
-                <li>Rm 9, Adebimpe Hostel, Stadium Kuye Ogbomosho </li>
-                <li>adelekeoluwamayokun27@gmail.com</li>
-                <li>07081696490</li>
+                <li hidden>{orderInfo.clientId}</li>
+                <li className='capitalize'>{`${orderInfo.fName} ${orderInfo.lName}`}</li>
+                <li>{orderInfo.address}</li>
+                <li>{orderInfo.email}</li>
+                <li>{orderInfo.phoneNumber}</li>
             </ul>
         </div> 
         <button

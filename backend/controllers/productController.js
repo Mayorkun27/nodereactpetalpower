@@ -12,6 +12,17 @@ export const uploadProduct = async (req, res) => {
     try {
         const { category, name, description, quantity, price } = req.body;
         const imagePath = req.file ? `/uploads/${req.file.filename}` : null; // ✅ Get image from Multer
+
+        console.log(name)
+        const findNameInDb = await productSchema.find({ name : name})
+        if (findNameInDb.length > 0) {
+            console.log(findNameInDb)
+            return res.json({
+                status: "failed",
+                message: `Product with name ${name} already exists. Update quantity instead.`,
+                found: findNameInDb 
+            })
+        }
        
         const createNewProduct = new productSchema({
             prodId: uuidv4(), // ✅ Always generates a unique ID

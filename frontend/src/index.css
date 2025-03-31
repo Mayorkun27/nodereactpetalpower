@@ -177,3 +177,39 @@ table, td, th{
 .CardEight:hover .status{
     @apply scale-105 transition-all
 }
+
+input[type="number"]::-webkit-inner-spin-button{
+    @apply hidden
+}
+
+.animate_CardSix{
+    animation: glow_border 1s ease 0s infinite forwards alternate-reverse;
+}
+
+@keyframes glow_border {
+    from{
+        @apply border-2 border-red-300 
+    }
+    to {
+        @apply border-2 border-red-600 shadow-2xl shadow-red-600/20
+    }
+}
+.firstIndicator{
+    position: relative;
+    z-index: 20 !important;
+}
+.firstIndicator::after{
+    content: "";
+    position: absolute;
+    bottom: 57%;
+    transform: translateY(-50%);
+    left: 26px;
+    width: 30vw;
+    height: 5px;
+    z-index: -1 !important;
+    background: #fff !important;
+}
+.firstIndicator.active::after{
+    z-index: -1 !important;
+    background: #000 !important;
+}

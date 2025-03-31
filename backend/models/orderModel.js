@@ -8,15 +8,15 @@ const orderSchema = new mongoose.Schema({
     },
     clientId: { 
         type: String, 
-        required: true 
+        optional: true 
     },
     clientName: { 
         type: String, 
-        required: true 
+        optional: true 
     },
     clientEmail: { 
         type: String, 
-        required: true
+        optional: true
     },
     clientTel: { 
         type: String 

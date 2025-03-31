@@ -6,10 +6,11 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { useUserUpdate } from "../hooks/UserContext";
 
 const Login = () => {
   const [visibility, setVisibility] = useState(false);
-  const [userDetails, setUserDetails] = useState([]);
+  const setSessionData = useUserUpdate();
 
   const navigate = useNavigate()
   // Formik initialization
@@ -46,11 +47,13 @@ const Login = () => {
                 })
                 console.log("response2", response2);
                 if (response2.status === 200) {
+                  localStorage.setItem('user', JSON.stringify(response2.data.user));
+                  setSessionData(response2.data.user)
                   toast.success(response.data.message)
                   toast.success(response2.data.message)
-                  toast.success("redirecting...")
+                  toast.success("Redirecting...")
                   setTimeout(() => {
-                    navigate("/")
+                    navigate("/?authenticated=true")
                   }, 3000);
                 } else {
                   toast.error(response2.data.message)
@@ -180,7 +183,7 @@ const Login = () => {
             <hr className="border w-full mt-1 border-secClr/30 rounded-full" />
           </div>
           <NavLink to={"/register"} className={"text-center block"}>
-            New here? Register Here.
+            New here? <span className="underline">Register Here.</span>
           </NavLink>
         </div>
       </div>

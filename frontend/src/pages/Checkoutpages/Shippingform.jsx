@@ -1,48 +1,71 @@
 import React, { useState, useEffect } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from "yup";
+import { useUser } from '../../hooks/UserContext';
 
 const ShoppingForm = ({ onSubmit, derivedDetails }) => {
 
-    const [userdetails, setUserDetails] = useState({});
-
-    useEffect(() => {
-        const getUsersDetails = localStorage.getItem("user");
-        setUserDetails(JSON.parse(getUsersDetails));
-    }, [])
+    const sessionData = useUser()
 
     const formik = useFormik({
         initialValues: {
-            fName: userdetails.fName,
-            lName: userdetails.lName,
-            email: userdetails.email,
-            phoneNumber: userdetails.phoneNumber,
-            address: userdetails.address,
+            clientId: sessionData._id,
+            fName: sessionData.fName,
+            lName: sessionData.lName,
+            email: sessionData.email,
+            phoneNumber: sessionData.phoneNumber ? sessionData.phoneNumber : "",
+            address: sessionData.address,
         },
         validationSchema: Yup.object({
+            clientId: Yup.string().required("First Name is Required"),
             fName: Yup.string().required("First Name is Required"),
             lName: Yup.string().required("Last Name is Required"),
             email: Yup.string().email("Invalid Email format").required("Email is Required"),
             phoneNumber: Yup.number().required("Phone Number is Required"),
             address: Yup.string().required("Address is Required"),
         }),
-        onSubmit: async (values, { setSubmitting}) => {
-            console.log("userdetails.fName", userdetails.fName);
-            console.log("values", values);
+        onSubmit: async (values, { setSubmitting }) => {
             setSubmitting(true)
+            console.log("values", values);
+            derivedDetails(values)
+            console.log("derivedDetails", derivedDetails)
+            setTimeout(() => {
+                setSubmitting(false)
+                onSubmit()
+            }, 2000);
         }
     })
 
     return (
 
         <form className='mt-10 flex flex-col gap-4' onSubmit={formik.handleSubmit}>
+            <div hidden>
+                <label className="block text-sm font-medium mb-2" htmlFor="clientId">Client Id</label>
+                <input
+                    type="text"
+                    name="clientId"
+                    id="clientId"
+                    readOnly
+                    className="w-full bg-pryClr/30 focus:ring-0 capitalize focus:border-secClr/30 rounded-sm opacity-55"
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    value={formik.values.clientId}
+                />
+                {
+                    formik.errors.clientId 
+                    ? 
+                    (<p className="text-red-600 text-sm">{formik.errors.clientId}</p>)
+                    :
+                    null
+                }
+            </div>
             <div>
                 <label className="block text-sm font-medium mb-2" htmlFor="fName">First Name</label>
                 <input
                     type="text"
                     name="fName"
                     id="fName"
-                    className="w-full bg-pryClr/30 focus:ring-0 focus:border-secClr/30 rounded-sm"
+                    className="w-full bg-pryClr/30 focus:ring-0 capitalize focus:border-secClr/30 rounded-sm"
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                     value={formik.values.fName}
@@ -61,7 +84,7 @@ const ShoppingForm = ({ onSubmit, derivedDetails }) => {
                     type="text"
                     name="lName"
                     id="lName"
-                    className="w-full bg-pryClr/30 focus:ring-0 focus:border-secClr/30 rounded-sm"
+                    className="w-full bg-pryClr/30 focus:ring-0 capitalize focus:border-secClr/30 rounded-sm"
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                     value={formik.values.lName}
@@ -99,7 +122,7 @@ const ShoppingForm = ({ onSubmit, derivedDetails }) => {
                     type="tel"
                     name="phoneNumber"
                     id="phoneNumber"
-                    className="w-full bg-pryClr/30 focus:ring-0 focus:border-secClr/30 rounded-sm"
+                    className="w-full bg-pryClr/30 focus:ring-0 capitalize focus:border-secClr/30 rounded-sm"
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                     value={formik.values.phoneNumber}
@@ -118,7 +141,7 @@ const ShoppingForm = ({ onSubmit, derivedDetails }) => {
                     type="text"
                     name="address"
                     id="address"
-                    className="w-full bg-pryClr/30 focus:ring-0 focus:border-secClr/30 rounded-sm"
+                    className="w-full bg-pryClr/30 focus:ring-0 capitalize focus:border-secClr/30 rounded-sm"
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                     value={formik.values.address}
@@ -134,9 +157,10 @@ const ShoppingForm = ({ onSubmit, derivedDetails }) => {
             <button 
                 type='submit'
                 className='bg-secClr text-pryClr w-full h-[45px] rounded-xl mt-5'
+                disabled={formik.isSubmitting}
             >
                 {
-                    formik.isSubmitting ? "Continuing to Summary" : "Continue to Summary"
+                    formik.isSubmitting ? "Continuing to Summary..." : "Continue to Summary"
                 }
             </button>
         </form>

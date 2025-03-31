@@ -1,6 +1,6 @@
 import express from "express";
 import { body } from "express-validator";
-import { registerUser, getallUsers, loginUser } from "../controllers/userController.js";
+import { registerUser, getallUsers, loginUser, getSubscribedUsers } from "../controllers/userController.js";
 import { protectRoute } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
@@ -11,7 +11,8 @@ router.post(
     body("fName").notEmpty().withMessage("First name is required"),
     body("lName").notEmpty().withMessage("Last name is required"),
     body("email").isEmail().withMessage("Valid email is required"),
-    body("password").isLength({ min: 6 }).withMessage("Password must be at least 6 characters"),
+    body("phoneNumber").optional(),
+    body("password").isLength({ min: 8 }).withMessage("Password must be at least 8 characters"),
     body("confPassword").custom((value, { req }) => {
       if (value !== req.body.password) {
         throw new Error("Passwords must match");
@@ -41,6 +42,8 @@ router.post("/logout", (req, res) => {
   res.status(200).json({ message: "Logged out successfully" });
 });
 
-router.get("/allusers", getallUsers)
+router.get("/allusers", getallUsers);
+
+router.get("/subdusers", getSubscribedUsers)
 
 export default router;

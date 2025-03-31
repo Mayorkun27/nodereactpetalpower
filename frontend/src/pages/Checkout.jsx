@@ -14,6 +14,7 @@ import Ordersummary from './Checkoutpages/Ordersummary';
 const Checkout = () => {
   const {cartProducts} = useCart();
   // const [billingDetails, setBillingDetails] = useState(null);
+  const [shippingDetails, setShippingDetails] = useState(null);
   
   const [currentIndex, setCurrentIndex] = useState(0);
   
@@ -34,10 +35,10 @@ const Checkout = () => {
     <div className="p-5 min-h-[100vh] flex justify-center items-center">
         <div className="card lg:w-3/4 w-full mx-auto bg-tetClr border border-secClr rounded-xl py-5 md:px-10 px-5">
             <h3 className='text-2xl text-center mb-3 font-bold'>Checkout</h3>
-            <StepsIndicator />
+            <StepsIndicator currentStep={currentIndex} />
             <div className="mt-10">
-              {currentIndex === 0 && <ShoppingForm />}
-              {currentIndex === 1 && <Ordersummary orderInfo={''} cartProducts={cartProducts} />}
+              {currentIndex === 0 && <ShoppingForm onSubmit={nextStep} derivedDetails={setShippingDetails} />}
+              {currentIndex === 1 && <Ordersummary orderInfo={shippingDetails} cartProducts={cartProducts} />}
               {currentIndex === 2 && <div>Coming Soon</div>}
             </div>
             <div className="flex justify-between items-center">
