@@ -2,6 +2,7 @@ import React from 'react';
 import img2 from "../assets/images/img2.jpg"
 import { FaInstagram, FaTwitter, FaLinkedin, FaTelegram, FaPinterest } from 'react-icons/fa';
 import SocialsBtn from './Button/Socialsbtn';
+import { Link } from 'react-router-dom';
 
 const Footer = ({ optStyle }) => {
 
@@ -69,7 +70,9 @@ const Footer = ({ optStyle }) => {
                         }
                     </div>
                     <hr className='border-secClr/30' />
-                    <p className="text-sm mt-4">©2024 All Rights Reserved.</p>
+                    <p className="text-sm mt-4">All Rights reserved  @2025</p>
+                    <p className="text-sm mt-4">Designed and developed by <Link className='text-compClr font-semibold' to={"https://sunmence.com.ng"}>Sunmence</Link> @2025 </p>
+                    
                 </div>
             </div>
         </footer>

@@ -33,12 +33,12 @@ const Navbar = () => {
     }, [sessionData]);    
 
     // ✅ Remove "?authenticated=true" from URL
-    const navigate = useNavigate();
-    useEffect(() => {
-        if (isAuthenticated) {
-            navigate(window.location.pathname, { replace: true }); // ✅ Removes query params
-        }
-    }, [isAuthenticated]);
+    // const navigate = useNavigate();
+    // useEffect(() => {
+    //     if (isAuthenticated) {
+    //         navigate(window.location.pathname, { replace: true }); // ✅ Removes query params
+    //     }
+    // }, [isAuthenticated]);
 
     useEffect(() => {
         let total = 0;

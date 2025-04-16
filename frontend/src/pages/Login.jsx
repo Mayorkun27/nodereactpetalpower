@@ -31,7 +31,7 @@ const Login = () => {
     onSubmit: async (values, { setSubmitting, resetForm }) => {
         setSubmitting(true)
         try {
-            const response = await axios.post("http://localhost:5000/api/v1/user/login", values, {
+            const response = await axios.post("https://nodereactpetalpower.vercel.app/user/login", values, {
               withCredentials: true,      
               headers: { 
                 "Content-Type": "application/json" 
@@ -39,7 +39,7 @@ const Login = () => {
             })
             if (response.status === 200) {
               try {
-                const response2 = await axios.get("http://localhost:5000/api/v1/user/session", {
+                const response2 = await axios.get("https://nodereactpetalpower.vercel.app/user/session", {
                   withCredentials: true,      
                   headers: { 
                     "Content-Type": "application/json" 
