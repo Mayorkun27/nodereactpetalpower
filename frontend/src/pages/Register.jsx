@@ -7,6 +7,8 @@ import axios from "axios";
 import BgCarousel from "../components/carousel/BgCarousel";
 import toast from "react-hot-toast";
 
+const api = import.meta.env.VITE_API_BASE_URL;
+
 const Register = () => {
 
     const [visibility1, setVisibility1] = useState(false)
@@ -47,7 +49,7 @@ const Register = () => {
             console.log(values);
             setSubmitting(true)
             try {
-                const response = await axios.post(`http://localhost:5000/api/v1/user/register`, values, {
+                const response = await axios.post(`${api}/user/register`, values, {
                     withCredentials: true,
                     headers: {
                         "Content-Type": "application/json",

@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 
+const api = import.meta.env.VITE_API_BASE_URL;
 
 const AllProduct = () => {
 
@@ -17,7 +18,7 @@ const AllProduct = () => {
 
   const fetchProducts = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/v1/product/allproducts")
+      const response = await axios.get(`${api}/product/allproducts`)
         if (response.status == 200 ) {
           toast.success(response.data.message)
           setProducts(response.data.data)
@@ -40,7 +41,7 @@ const AllProduct = () => {
   
   const handleProductDeletion = (productId, productName) => {
     console.log(productId)
-    axios.delete(`http://localhost:5000/api/v1/product/deleteproduct/${productId}`)
+    axios.delete(`${api}/product/deleteproduct/${productId}`)
     .then(response => {
       console.log(response);
       if (response.status === 200) {

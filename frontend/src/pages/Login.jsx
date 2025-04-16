@@ -8,6 +8,8 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { useUserUpdate } from "../hooks/UserContext";
 
+const api = import.meta.env.VITE_API_BASE_URL;
+
 const Login = () => {
   const [visibility, setVisibility] = useState(false);
   const setSessionData = useUserUpdate();
@@ -31,7 +33,7 @@ const Login = () => {
     onSubmit: async (values, { setSubmitting, resetForm }) => {
         setSubmitting(true)
         try {
-            const response = await axios.post("https://nodereactpetalpower.vercel.app/user/login", values, {
+            const response = await axios.post(`${api}/user/login`, values, {
               withCredentials: true,      
               headers: { 
                 "Content-Type": "application/json" 
@@ -39,7 +41,7 @@ const Login = () => {
             })
             if (response.status === 200) {
               try {
-                const response2 = await axios.get("https://nodereactpetalpower.vercel.app/user/session", {
+                const response2 = await axios.get(`${api}/user/session`, {
                   withCredentials: true,      
                   headers: { 
                     "Content-Type": "application/json" 

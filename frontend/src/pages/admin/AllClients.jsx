@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 
+const api = import.meta.env.VITE_API_BASE_URL;
+
 const AllClients = () => {
 
     const [users, setUsers] = useState([])
@@ -11,7 +13,7 @@ const AllClients = () => {
         const fetchUsers = async () => {
             setIsLoading(true)
             try {
-                const response = await axios.get("http://localhost:5000/api/v1/user/allusers")
+                const response = await axios.get(`${api}/user/allusers`)
                 console.log(response)
                 console.log("response.data",response.data)
                 if (response.status == 200 ) {

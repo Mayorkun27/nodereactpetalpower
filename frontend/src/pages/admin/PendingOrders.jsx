@@ -4,6 +4,7 @@ import CardSeven from "../../components/card/CardSeven";
 import ButtonTwo from "../../components/Button/Buttontwo";
 import toast from "react-hot-toast";
 
+const api = import.meta.env.VITE_API_BASE_URL;
 
 const PendingOrders = () => {
 
@@ -43,7 +44,7 @@ const PendingOrders = () => {
   const fetchOrders = async () => {
     setIsLoading(true)
     try {
-      const response = await axios.get("http://localhost:5000/api/v1/order/allorders ")
+      const response = await axios.get(`${api}/order/allorders`)
       console.log(response)
       if (response.status == 200) {
           setTimeout(() => {
@@ -70,7 +71,7 @@ const PendingOrders = () => {
   const handleOrderCompletion = (orderId) => {
     // setDeletingLect(true);
     console.log(orderId)
-    axios.post(`http://localhost:5000/api/v1/order/completeorder/${orderId}`)
+    axios.post(`${api}/order/completeorder/${orderId}`)
       .then(response => {
           console.log(response);
           if (response.status === 200) {

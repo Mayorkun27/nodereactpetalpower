@@ -5,6 +5,7 @@ import axios from "axios";
 import { v4 as uuidv4 } from "uuid";
 import toast from "react-hot-toast";
 
+const api = import.meta.env.VITE_API_BASE_URL;
 
 const Addproduct = () => {
 
@@ -42,7 +43,7 @@ const Addproduct = () => {
       }
       
       try {
-        const response = await axios.post("http://localhost:5000/api/v1/product/uploadproduct", formData, {
+        const response = await axios.post(`${api}/product/uploadproduct`, formData, {
            headers: { "Content-Type": "multipart/form-data" } 
         });
         console.log("Response:", response.data);

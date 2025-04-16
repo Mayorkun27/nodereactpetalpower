@@ -10,6 +10,8 @@ import { useCart } from "../../hooks/CartContext";
 import axios from "axios";
 import toast from "react-hot-toast";
 
+const api = import.meta.env.VITE_API_BASE_URL;
+
 const ShopProducts = ({ category }) => {
 
     const [openFilterBar, setOpenFilterBar] = useState(false)
@@ -71,7 +73,7 @@ const ShopProducts = ({ category }) => {
         const fetchProducts = async () => {
             setIsLoading(true)
             try {
-                const response = await axios.get("http://localhost:5000/api/v1/product/allproducts")
+                const response = await axios.get(`${api}/product/allproducts`)
                 console.log(response)
                 if (response.status === 200) {
                     setAllProducts(response.data.data)

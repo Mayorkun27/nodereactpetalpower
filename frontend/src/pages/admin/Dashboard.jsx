@@ -3,6 +3,8 @@ import img2 from "../../assets/images/img2.jpg"
 import axios from "axios";
 import toast from "react-hot-toast";
 
+const api = import.meta.env.VITE_API_BASE_URL;
+
 const AdminDashboard = () => {
 
     const [users, setUsers] = useState([])
@@ -13,7 +15,7 @@ const AdminDashboard = () => {
         const fetchUsers = async () => {
             setIsLoadingUsers(true)
             try {
-                const response = await axios.get("http://localhost:5000/api/v1/user/allusers")
+                const response = await axios.get(`${api}/user/allusers`)
                 console.log(response)
                 if (response.status == 200 ) {
                     toast.success("Users stat fetched successfully")
@@ -32,7 +34,7 @@ const AdminDashboard = () => {
         const fetchProducts = async () => {
             setIsLoadingUsers(true)
             try {
-                const response = await axios.get("http://localhost:5000/api/v1/product/allproducts")
+                const response = await axios.get(`${api}/product/allproducts`)
                 console.log(response)
                 if (response.status == 200 ) {
                     toast.success("Products stat fetched successfully")

@@ -8,7 +8,7 @@ import ProductPage from "./components/Ex_Product/ProductPage.jsx";
 import Addproduct from "./pages/admin/AddProduct";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
-import AdminDashboard from "./pages/admin/dashboard";
+import AdminDashboard from "./pages/admin/Dashboard.jsx";
 import AdminPageLayout from "./Layout/AdminPageLayOut.jsx";
 import AllProduct from "./pages/admin/AllProducts";
 import PendingOrders from "./pages/admin/PendingOrders";
