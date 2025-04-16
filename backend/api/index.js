@@ -154,6 +154,64 @@
 // export default server;
 
 
+// import express from "express";
+// import cors from "cors";
+// import dotenv from "dotenv";
+// import cookieParser from "cookie-parser";
+// import userRouter from "../routes/userRoutes.js";
+// import productRouter from "../routes/productRoutes.js";
+// import orderRouter from "../routes/orderRoutes.js";
+// import connectDb from "../dB/connect.js";
+// import path from "path";
+// import { createServer } from "http";
+// import { parse } from "url";
+
+// dotenv.config();
+// connectDb();
+
+// const app = express();
+
+// // ✅ Manual CORS headers middleware
+// app.use((req, res, next) => {
+//   res.header('Access-Control-Allow-Origin', 'https://medaid.com.ng');
+//   res.header('Access-Control-Allow-Credentials', 'true');
+//   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+//   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+//   if (req.method === 'OPTIONS') {
+//     return res.status(200).end();
+//   }
+//   next();
+// });
+
+// // Optionally still use CORS middleware (can be removed if manual is enough)
+// app.use(cors({
+//   origin: "https://medaid.com.ng",
+//   credentials: true
+// }));
+
+// app.use(cookieParser());
+// app.use(express.json());
+
+// app.get("/", (req, res) => {
+//   res.send("API is live");
+// });
+
+// app.use("/api/v1/user", userRouter);
+// app.use("/api/v1/product", productRouter);
+// app.use("/api/v1/order", orderRouter);
+// app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
+
+// // ✅ Serverless-compatible export
+// const server = createServer((req, res) => {
+//   const parsedUrl = parse(req.url, true);
+//   app(req, res);
+// });
+
+// export default server;
+
+
+
+
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
@@ -163,32 +221,28 @@ import productRouter from "../routes/productRoutes.js";
 import orderRouter from "../routes/orderRoutes.js";
 import connectDb from "../dB/connect.js";
 import path from "path";
-import { createServer } from "http";
-import { parse } from "url";
 
 dotenv.config();
 connectDb();
 
 const app = express();
 
-// ✅ Manual CORS headers middleware
+// ✅ CORS Headers Middleware
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', 'https://medaid.com.ng');
-  res.header('Access-Control-Allow-Credentials', 'true');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+  res.setHeader('Access-Control-Allow-Origin', 'https://medaid.com.ng');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
   next();
 });
 
-// Optionally still use CORS middleware (can be removed if manual is enough)
 app.use(cors({
   origin: "https://medaid.com.ng",
   credentials: true
 }));
-
 app.use(cookieParser());
 app.use(express.json());
 
@@ -201,11 +255,5 @@ app.use("/api/v1/product", productRouter);
 app.use("/api/v1/order", orderRouter);
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
-// ✅ Serverless-compatible export
-const server = createServer((req, res) => {
-  const parsedUrl = parse(req.url, true);
-  app(req, res);
-});
-
-export default server;
-
+// ✅ Export a handler for Vercel
+export default app;
