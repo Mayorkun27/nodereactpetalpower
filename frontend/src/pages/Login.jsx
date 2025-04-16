@@ -32,6 +32,8 @@ const Login = () => {
     }),
     onSubmit: async (values, { setSubmitting, resetForm }) => {
         setSubmitting(true)
+        console.log("API base:", import.meta.env.VITE_API_BASE_URL);
+        console.log("Sending to:", `${api}/user/login`);
         try {
             const response = await axios.post(`${api}/user/login`, values, {
               withCredentials: true,      
