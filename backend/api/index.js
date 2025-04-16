@@ -75,7 +75,7 @@ import productRouter from "../routes/productRoutes.js";
 import orderRouter from "../routes/orderRoutes.js";
 import connectDb from "../dB/connect.js";
 import path from "path";
-import { handler } from 'vercel-node-serverless'; // This line is just for clarity, not actual import
+// import { handler } from 'vercel-node-serverless'; // This line is just for clarity, not actual import
 
 dotenv.config();
 connectDb();
