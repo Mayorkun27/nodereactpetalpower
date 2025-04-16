@@ -66,6 +66,50 @@
 
 // server.js or api/index.js
 
+// import express from "express";
+// import cors from "cors";
+// import dotenv from "dotenv";
+// import cookieParser from "cookie-parser";
+// import userRouter from "../routes/userRoutes.js";
+// import productRouter from "../routes/productRoutes.js";
+// import orderRouter from "../routes/orderRoutes.js";
+// import connectDb from "../dB/connect.js";
+// import path from "path";
+// // import { handler } from 'vercel-node-serverless'; // This line is just for clarity, not actual import
+
+// dotenv.config();
+// connectDb();
+
+// const app = express();
+
+// app.use(cors({
+//   origin: "https://medaid.com.ng",
+//   credentials: true
+// }));
+// app.use(cookieParser());
+// app.use(express.json());
+
+// app.get("/", (req, res) => {
+//   res.send("API is live");
+// });
+
+// app.use("/api/v1/user", userRouter);
+// app.use("/api/v1/product", productRouter);
+// app.use("/api/v1/order", orderRouter);
+// app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
+
+// // ✅ Export a serverless handler for Vercel
+// import { createServer } from "http";
+// import { parse } from "url";
+
+// const server = createServer((req, res) => {
+//   const parsedUrl = parse(req.url, true);
+//   app(req, res);
+// });
+
+// export default server;
+
+
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
@@ -75,17 +119,20 @@ import productRouter from "../routes/productRoutes.js";
 import orderRouter from "../routes/orderRoutes.js";
 import connectDb from "../dB/connect.js";
 import path from "path";
-// import { handler } from 'vercel-node-serverless'; // This line is just for clarity, not actual import
+import { createServer } from "http";
+import { parse } from "url";
 
 dotenv.config();
 connectDb();
 
 const app = express();
 
+// Configure CORS at the very beginning of the middleware
 app.use(cors({
-  origin: ["http://localhost:5173", "https://medaid.com.ng"],
+  origin: "https://medaid.com.ng",
   credentials: true
 }));
+
 app.use(cookieParser());
 app.use(express.json());
 
@@ -98,10 +145,7 @@ app.use("/api/v1/product", productRouter);
 app.use("/api/v1/order", orderRouter);
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
-// ✅ Export a serverless handler for Vercel
-import { createServer } from "http";
-import { parse } from "url";
-
+// Serverless handler for Vercel
 const server = createServer((req, res) => {
   const parsedUrl = parse(req.url, true);
   app(req, res);
