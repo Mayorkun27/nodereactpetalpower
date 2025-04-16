@@ -83,7 +83,7 @@ connectDb();
 const app = express();
 
 app.use(cors({
-  origin: ["http://localhost:5173", "https://yourfrontenddomain.com"],
+  origin: ["http://localhost:5173", "https://medaid.com.ng"],
   credentials: true
 }));
 app.use(cookieParser());
